@@ -18,3 +18,10 @@ default[:geminabox][:ssl][:cert] = ""
 # ruby
 default["rbenv"]["rubies"] = "2.3.0"
 default["rbenv"]["gems"] = { "2.3.0" => [{ name: "bundler" }] }
+
+# backup
+default[:geminabox][:backup][:enabled] = false
+default[:geminabox][:backup][:s3_access_key_id] = ""
+default[:geminabox][:backup][:s3_secret_access_key] = ""
+default[:geminabox][:backup][:region] = "us-east-1"
+default[:geminabox][:backup][:bucket] = ""

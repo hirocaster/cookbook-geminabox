@@ -74,3 +74,34 @@ directory "/srv/geminabox" do
   mode "0775"
   action :create
 end
+
+if(node[:geminabox][:backup][:enabled])
+
+  package "ruby-dev"
+
+  include_recipe "backup"
+
+  backup_model :gems do
+    description "Back up gems"
+
+    definition <<-DEF
+
+      archive :gems_archive do |archive|
+        archive.use_sudo
+        archive.add '#{node[:geminabox][:base_directory]}'
+      end
+
+      split_into_chunks_of 250
+
+      compress_with Gzip
+
+      store_with S3 do |s3|
+        s3.access_key_id = '#{node[:geminabox][:backup][:s3_access_key_id]}'
+        s3.secret_access_key = '#{node[:geminabox][:backup][:s3_secret_access_key]}'
+        s3.bucket = '#{node[:geminabox][:backup][:bucket]}'
+        s3.region = '#{node[:geminabox][:backup][:region]}'
+      end
+    DEF
+    schedule({ :minute => 0, :hour   => 2 })
+  end
+end
