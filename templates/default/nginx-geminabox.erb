@@ -15,49 +15,15 @@ upstream puma {
 }
 
 server {
-    listen <%= node[:geminabox][:nginx][:port] %>;
-
-    client_max_body_size <%= node[:geminabox][:nginx][:client_max_body_size] %>;
-
     <% if @ssl %>
-    location / {
-        rewrite ^/(.*)$ https://$host/$1 redirect;
-    }
-    <% else %>
-    proxy_set_header Host $http_host;
-
-    keepalive_timeout   75;
-    keepalive_requests  100;
-
-    location @puma {
-        proxy_pass http://puma;
-    }
-
-    # see lib/geminabox/proxy/hostess.rb
-    location ~ \.gz$ {
-        try_files $uri @puma;
-    }
-    location ~ \.(rz|Z)$ {
-        try_files $uri @puma;
-    }
-    location ~ ^/(yaml|Marshal\.4\.8|specs\.4\.8|latest_specs\.4\.8|prerelease_specs\.4\.8)$ {
-        try_files $uri @puma;
-    }
-    location ~ \.gem$ {
-        try_files $uri @puma;
-    }
-
-    location / {
-        proxy_pass http://puma;
-    }
-    <% end %>
-}
-
-<% if @ssl %>
-server {
     listen <%= node[:geminabox][:nginx][:ssl_port] %>;
+    <% else %>
+    listen <%= node[:geminabox][:nginx][:port] %>;
+    <% end %>
 
     server_name <%= node[:geminabox][:nginx][:server_name] %>;
+
+    client_max_body_size <%= node[:geminabox][:nginx][:client_max_body_size] %>;
 
     ssl on;
     ssl_certificate <%= @ssl_cert %>;
@@ -65,11 +31,6 @@ server {
     ssl_ciphers HIGH;
     ssl_protocols SSLv3 TLSv1;
     ssl_prefer_server_ciphers on;
-    <% if @auth_file %>
-    auth_basic "Restricted Access";
-    auth_basic_user_file <%= @auth_file %>;
-    <% end %>
-    client_max_body_size <%= node[:geminabox][:nginx][:client_max_body_size] %>;
 
     keepalive_timeout   75;
     keepalive_requests  100;
@@ -96,4 +57,3 @@ server {
         proxy_pass http://puma;
     }
 }
-<% end %>
