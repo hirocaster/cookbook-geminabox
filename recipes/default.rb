@@ -102,6 +102,7 @@ if(node[:geminabox][:backup][:enabled])
         s3.region = '#{node[:geminabox][:backup][:region]}'
       end
     DEF
+    cron_options({ :path => "/usr/local/bin:/usr/bin:/bin" })
     schedule({ :minute => 0, :hour   => 2 })
   end
 end
