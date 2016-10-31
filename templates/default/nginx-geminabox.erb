@@ -25,12 +25,14 @@ server {
 
     client_max_body_size <%= node[:geminabox][:nginx][:client_max_body_size] %>;
 
+    <% if @ssl %>
     ssl on;
     ssl_certificate <%= @ssl_cert %>;
     ssl_certificate_key <%= @ssl_key %>;
     ssl_ciphers HIGH;
     ssl_protocols SSLv3 TLSv1;
     ssl_prefer_server_ciphers on;
+    <% end %>
 
     keepalive_timeout   75;
     keepalive_requests  100;
